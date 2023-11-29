@@ -19,12 +19,6 @@ from PySide6.QtCore import QUrl
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 
-if sys.platform == "win32":
-    from win import WindowsEventFilter as EventFilter
-    from win import WindowsWindowEffect as WindowEffect
-else:
-    from linux import LinuxEventFilter as EventFilter
-
 
 class MyApp(QGuiApplication):
 
@@ -32,16 +26,28 @@ class MyApp(QGuiApplication):
         super().__init__()
         self._engine = QQmlApplicationEngine()
 
-        self.event_filter = EventFilter(8)
-        # self.installNativeEventFilter(self.event_filter)
-        # self.win_utilities = WindowEffect()
+        self._border_width = 8
+        self._native_event_filter = None
 
-    def start_engine(self):
+    def install_event_filter(self):
+        if sys.platform == "win32":
+            from win import WindowsEventFilter
+            self._native_event_filter = WindowsEventFilter(self._border_width)
+            self.installNativeEventFilter(self._native_event_filter)
+        elif sys.platform == 'linux':
+            from linux import LinuxEventFilter
+            self._native_event_filter = LinuxEventFilter(self._border_width)
+
+    def start_qml_engine(self):
         self._engine.load(QUrl.fromLocalFile('app.qml'))
 
-        # for win in self.allWindows():
-            # self.win_utilities.addShadowEffect(win.winId())
-            # self.win_utilities.addWindowAnimation(win.winId())
+    def add_window_effects(self):
+        if sys.platform == "win32":
+            hwnd = self.topLevelWindows()[0].winId()
+            from win import WindowsWindowEffect
+            self._effects = WindowsWindowEffect()
+            self._effects.addShadowEffect(hwnd)
+            self._effects.addWindowAnimation(hwnd)
 
     def verify(self):
         if not self._engine.rootObjects():
@@ -53,6 +59,8 @@ class MyApp(QGuiApplication):
 
 if __name__ == '__main__':
     app = MyApp()
-    app.start_engine()
+    app.install_event_filter()
+    app.start_qml_engine()
+    app.add_window_effects()
     app.verify()
     app.run()
