@@ -19,8 +19,11 @@ from PySide6.QtCore import QUrl
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 
-from win import WindowsEventFilter as EventFilter
-from win import WindowsWindowEffect as WindowEffect
+if sys.platform == "win32":
+    from win import WindowsEventFilter as EventFilter
+    from win import WindowsWindowEffect as WindowEffect
+else:
+    from linux import LinuxEventFilter as EventFilter
 
 
 class MyApp(QGuiApplication):
@@ -29,16 +32,16 @@ class MyApp(QGuiApplication):
         super().__init__()
         self._engine = QQmlApplicationEngine()
 
-        self.event_filter = EventFilter(5)
-        self.installNativeEventFilter(self.event_filter)
-        self.win_utilities = WindowEffect()
+        self.event_filter = EventFilter(8)
+        # self.installNativeEventFilter(self.event_filter)
+        # self.win_utilities = WindowEffect()
 
     def start_engine(self):
         self._engine.load(QUrl.fromLocalFile('app.qml'))
 
-        for win in self.allWindows():
-            self.win_utilities.addShadowEffect(win.winId())
-            self.win_utilities.addWindowAnimation(win.winId())
+        # for win in self.allWindows():
+            # self.win_utilities.addShadowEffect(win.winId())
+            # self.win_utilities.addWindowAnimation(win.winId())
 
     def verify(self):
         if not self._engine.rootObjects():

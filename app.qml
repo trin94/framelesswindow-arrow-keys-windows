@@ -61,8 +61,13 @@ ApplicationWindow {
             anchors.rightMargin: 8
             anchors.topMargin: 8
 
-            onPressed: {
-                appWindow.close()
+            MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+
+                onReleased: {
+                    appWindow.close()
+                }
             }
         }
 
