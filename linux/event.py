@@ -20,20 +20,19 @@
 
 from typing import Optional
 
-from PySide6.QtCore import QCoreApplication, QAbstractNativeEventFilter, QObject, QEvent, Qt
+from PySide6.QtCore import QCoreApplication, QObject, QEvent, Qt
 from PySide6.QtGui import QCursor, QGuiApplication, QWindow
 
 
-class LinuxEventFilter(QObject, QAbstractNativeEventFilter):
+class LinuxEventFilter(QObject):
 
     def __init__(self, border_width=None) -> None:
         super().__init__()
         self.border_width = border_width
 
         self._app: QGuiApplication = QCoreApplication.instance()
-        self._app.installEventFilter(self)
-        self._window: Optional[QWindow] = None
         self._is_wayland = self._app.platformName() == "wayland"
+        self._window: Optional[QWindow] = None
 
     def eventFilter(self, obj, event):
         if event.type() != QEvent.MouseButtonPress and event.type() != QEvent.MouseMove:

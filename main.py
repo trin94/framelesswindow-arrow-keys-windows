@@ -27,16 +27,17 @@ class MyApp(QGuiApplication):
         self._engine = QQmlApplicationEngine()
 
         self._border_width = 8
-        self._native_event_filter = None
+        self._event_filter = None
 
     def install_event_filter(self):
         if sys.platform == "win32":
             from win import WindowsEventFilter
-            self._native_event_filter = WindowsEventFilter(self._border_width)
-            self.installNativeEventFilter(self._native_event_filter)
+            self._event_filter = WindowsEventFilter(self._border_width)
+            self.installNativeEventFilter(self._event_filter)
         elif sys.platform == 'linux':
             from linux import LinuxEventFilter
-            self._native_event_filter = LinuxEventFilter(self._border_width)
+            self._event_filter = LinuxEventFilter(self._border_width)
+            self.installEventFilter(self._event_filter)
 
     def start_qml_engine(self):
         self._engine.load(QUrl.fromLocalFile('app.qml'))
