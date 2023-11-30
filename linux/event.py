@@ -41,7 +41,7 @@ class LinuxEventFilter(QObject):
         if self._window is None:
             self._window = self._app.topLevelWindows()[0]
 
-        pos = QCursor.pos() if self._is_wayland else QCursor.pos() - self._window.position()
+        pos = QCursor.pos() - self._window.position()
         edges = Qt.Edge(0)
         if pos.x() < self.border_width:
             edges |= Qt.LeftEdge
@@ -68,4 +68,4 @@ class LinuxEventFilter(QObject):
             self._window.startSystemResize(edges)
             return True
 
-        return False
+        return super().eventFilter(obj, event)
